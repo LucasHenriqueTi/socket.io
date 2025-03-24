@@ -1,5 +1,6 @@
-import { registerUser, getUserId } from '../services/user-service.js';
+import { registerUser, getUserId, getAllUser } from '../services/user-service.js';
 
+// criar um usuário
 const createUser = async (req, res) => {
     const { name } = req.body;
 
@@ -12,6 +13,17 @@ const createUser = async (req, res) => {
     }
 };
 
+// obter todos os usuários
+const getAllUsers = async (req, res) => {
+    try {
+        const users = await getAllUser();
+        res.status(200).json({ success: true, users });
+    }catch (error) {
+        res.status(500).json({ success: false, error: 'Erro ao buscar usuários'
+    })};
+};
+
+// obter um usuário
 const getUserDetails = async (req, res) => {
     const { userId } = req.params;
 
@@ -24,4 +36,4 @@ const getUserDetails = async (req, res) => {
     }
 };
 
-export { createUser, getUserDetails };
+export { createUser, getUserDetails, getAllUsers};
