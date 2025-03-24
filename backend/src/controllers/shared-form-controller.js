@@ -1,5 +1,6 @@
 import { shareForm, getSharedForms } from '../services/shared-form-service.js';
 
+// compartilhar um formulário com um usuário
 const shareFormWithUser = async (req, res) => {
     const { formId, userId } = req.body;
 
@@ -12,6 +13,7 @@ const shareFormWithUser = async (req, res) => {
     }
 };
 
+// buscar formulários compartilhados por usuário
 const getSharedFormsByUser = async (req, res) => {
     const { userId } = req.params;
 
