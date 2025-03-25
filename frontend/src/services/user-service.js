@@ -1,8 +1,8 @@
 import api from './api';
 
 // Criar um novo usuário
-const createUser = (userData) => 
-    api.post(`/users`, userData);
+const createUser = (name) => 
+    api.post(`/users`, name);
 
 // Obter todos os usuários
 const getUsers = () => 
@@ -12,4 +12,4 @@ const getUsers = () =>
 const getUserById = (userId) => 
     api.get(`/users/${userId}`);
 
-export default { createUser, getUsers, getUserById };
+export { createUser, getUsers, getUserById };
