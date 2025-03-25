@@ -1,13 +1,9 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
-import UserForm from './components/UserForm'
-import UserList from './components/UserList'
+import UsersPage from './pages/UsersPage'
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    <>
-    <UserForm />
-    <UserList />
-    </>
+    <UsersPage/>
   </React.StrictMode>
 )

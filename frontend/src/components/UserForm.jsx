@@ -2,7 +2,7 @@ import { useState } from "react";
 import { TextField, Button, Box, Typography } from "@mui/material";
 import {createUser} from "../services/user-service";
 
-const UserForm = () => {
+const UserForm = ({onUserCreated}) => {
     const [name, setName] = useState('');
 
     const handleSubmit = async (e) =>{
@@ -11,6 +11,7 @@ const UserForm = () => {
             await createUser({name});
             console.log('usuário criado', name)
             setName('');
+            onUserCreated();
         }catch (error) {
             console.log('erro ao criar usuario', error);
         }
