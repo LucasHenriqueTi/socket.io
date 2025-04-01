@@ -12,4 +12,8 @@ const getUsers = () =>
 const getUserById = (userId) => 
     api.get(`/users/${userId}`);
 
-export { createUser, getUsers, getUserById };
+// Deleta todos os Usuários 
+const deleteAllUsers = () => 
+    api.post(`/delete-all`); 
+
+export { createUser, getUsers, getUserById, deleteAllUsers };
