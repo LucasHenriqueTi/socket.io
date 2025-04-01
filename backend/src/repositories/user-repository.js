@@ -17,4 +17,9 @@ const getUserById = async (userId) => {
     });
 };
 
-export  {createUser, getUserById, getAllUsers}
+// deleta todos os usuários 
+const deleteAllUsers = async () => {
+    return await prisma.user.deleteMany();
+}
+
+export  {createUser, getUserById, getAllUsers, deleteAllUsers}

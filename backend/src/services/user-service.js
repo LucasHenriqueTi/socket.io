@@ -1,4 +1,4 @@
-import {createUser, getUserById, getAllUsers} from '../repositories/user-repository.js';
+import {createUser, getUserById, getAllUsers, deleteAllUsers} from '../repositories/user-repository.js';
 
 // criar um usuário
 const registerUser = async (name) => {
@@ -15,4 +15,9 @@ const getUserId = async (userId) => {
     return await getUserById(userId);
 }
 
-export {registerUser, getUserId, getAllUser};
+// deleta todos os usuários 
+const deleteUsers = async () => {
+    return await deleteAllUsers();
+}
+
+export {registerUser, getUserId, getAllUser, deleteUsers};

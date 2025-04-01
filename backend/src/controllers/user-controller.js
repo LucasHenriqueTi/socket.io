@@ -1,4 +1,4 @@
-import { registerUser, getUserId, getAllUser } from '../services/user-service.js';
+import { registerUser, getUserId, getAllUser, deleteUsers } from '../services/user-service.js';
 
 // criar um usuário
 const createUser = async (req, res) => {
@@ -36,4 +36,15 @@ const getUserDetails = async (req, res) => {
     }
 };
 
-export { createUser, getUserDetails, getAllUsers};
+// deleta todos os usuários
+const deleteAllUsers = async (req, res) => {
+    try {
+        const deleteAll = await deleteUsers();
+        res.status(202).json({success: true, deleteAll})
+    }catch (error) {
+        console.error('Erro ao deletar os usuários', error)
+        res.status(404).json({success: false, error: 'Erro ao deleter os usuários'});
+    }
+};
+
+export { createUser, getUserDetails, getAllUsers, deleteAllUsers};

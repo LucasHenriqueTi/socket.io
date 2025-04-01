@@ -1,5 +1,5 @@
 import express from 'express';
-import { createUser, getUserDetails, getAllUsers } from '../controllers/user-controller.js';
+import { createUser, getUserDetails, getAllUsers, deleteAllUsers } from '../controllers/user-controller.js';
 import { createForm, getFormDetails, getAllForms } from '../controllers/form-controller.js';
 import { shareFormWithUser, getSharedFormsByUser } from '../controllers/shared-form-controller.js';
 
@@ -7,6 +7,7 @@ const router = express.Router();
 
 // Rotas de Usuário
 router.post('/users', createUser);
+router.post('/delete-all', deleteAllUsers)
 router.get('/users', getAllUsers);
 router.get('/users/:userId', getUserDetails);
 
