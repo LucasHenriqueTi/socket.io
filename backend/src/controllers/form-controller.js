@@ -2,7 +2,7 @@ import { registerForm, getForm, getAllFroms } from '../services/form-service.js'
 
 // criar um formulário
 const createForm = async (req, res) => {
-    const { name, userId } = req.body;
+    const { name, number:userId } = req.body;
 
     try {
         const form = await registerForm(name, userId);

@@ -40,7 +40,7 @@ const UserForm = ({onUserCreated}) => {
         <Button type="submit" variant="contained" color="primary">
           Cadastrar
         </Button>
-        <Button onClick={handleDeleteAll}>
+        <Button variant="contained" onClick={handleDeleteAll}>
           Deletar Usuários
         </Button>
       </Box>

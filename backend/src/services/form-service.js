@@ -1,7 +1,12 @@
 import {createForm, getFormsById, getAllForms} from '../repositories/form-repository.js';
+import {getUserId} from './user-service.js'
 
 // criar um formulário
 const registerForm = async (name, userId) => {
+    const user = await getUserId(userId);
+    if (!user) {
+        throw new Error('usuário não encontrado')
+    }
     return await createForm(name, userId);
 };
 

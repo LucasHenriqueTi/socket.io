@@ -12,4 +12,4 @@ const getForms = () =>
 const getFormById = (id) => 
     api.get(`/forms/${id}`);
 
-export default { createForm, getForms, getFormById };
+export  { createForm, getForms, getFormById };
