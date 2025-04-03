@@ -3,7 +3,7 @@ import { TextField, Button, Box, Typography } from '@mui/material';
 import { createForm } from '../services/form-service';
 
 
-const FormForm = ({onFormCreated}) => {
+const FormForm = () => {
     const [name, setName] = useState('');
     const [userId, setUserId] = useState('');
 
@@ -13,7 +13,6 @@ const FormForm = ({onFormCreated}) => {
             await createForm({name, userId: (userId)});
             setName('');
             setUserId('');
-            onFormCreated('');
             console.log('formulário criado')
         }catch(error){
             console.log('erro ao criar o formulário', error);
