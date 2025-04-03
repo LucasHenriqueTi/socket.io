@@ -3,6 +3,7 @@ import { Container } from '@mui/material';
 import UserForm from '../components/UserForm';
 import UserList from '../components/UserList';
 import FormForm from '../components/FormForm';
+import FormList from '../components/FormList'
 
 const UsersPage = () => {
   const [refresh, setRefresh] = useState(false);
@@ -12,6 +13,7 @@ const UsersPage = () => {
       <UserForm onUserCreated={() => setRefresh(!refresh)} />
       <UserList />
       <FormForm />
+      <FormList />
     </Container>
   );
 }
