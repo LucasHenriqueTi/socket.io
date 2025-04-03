@@ -2,16 +2,32 @@ import { registerForm, getForm, getAllFroms } from '../services/form-service.js'
 
 // criar um formulário
 const createForm = async (req, res) => {
-    const { name, number:userId } = req.body;
-
-    try {
-        const form = await registerForm(name, userId);
-        res.status(201).json({ success: true, form });
-    } catch (error) {
-        console.error('Erro ao criar formulário:', error);
-        res.status(500).json({ success: false, error: 'Erro ao criar formulário' });
+    const { name, userId } = req.body;
+  
+    // Validação explícita
+    if (!name || !userId) {
+      return res.status(400).json({ 
+        success: false, 
+        error: 'Nome e ID do usuário são obrigatórios' 
+      });
     }
-};
+  
+    try {
+      const form = await registerForm(name, Number(userId));
+      res.status(201).json({ 
+        success: true, 
+        form 
+      });
+    } catch (error) {
+      console.error('Erro detalhado:', error);
+      res.status(500).json({ 
+        success: false, 
+        error: error.message 
+      });
+    }
+  };
+
+
 
 // obter todos os formulários
 const getAllForms = async (req, res) => {
