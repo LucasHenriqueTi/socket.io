@@ -1,8 +1,10 @@
 import api from './api';
 
 
-export const shareForm = (shareData) => 
+const shareForm = (shareData) => 
     api.post('/share', shareData);
 
-export const getSharedForms = (userId) => 
+const getSharedForms = (userId) => 
     api.get(`/shared-forms/${userId}`);
+
+export { shareForm, getSharedForms }
