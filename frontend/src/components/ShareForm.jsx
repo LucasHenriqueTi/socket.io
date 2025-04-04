@@ -36,6 +36,7 @@ const ShareForm = () => {
             alert('formulário compartilhado com sucesso!');
             setFormId('');
             setUserId('');
+            console.log('formulário compartilhado com sucesso!', formId, userId);
         } catch (error) {
             console.error('error ao compatilhar formulário', error)
         }

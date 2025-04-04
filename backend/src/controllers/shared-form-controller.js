@@ -19,7 +19,7 @@ const getSharedFormsByUser = async (req, res) => {
 
     try {
         const sharedForms = await getSharedForms(userId);
-        res.status(200).json({ success: true, sharedForms });
+        res.status(200).json({ success: true, userId , sharedForms });
     } catch (error) {
         console.error('Erro ao buscar formulários compartilhados:', error);
         res.status(500).json({ success: false, error: 'Erro ao buscar formulários compartilhados' });

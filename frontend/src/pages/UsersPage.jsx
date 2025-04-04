@@ -5,6 +5,7 @@ import UserList from '../components/UserList';
 import FormForm from '../components/FormForm';
 import FormList from '../components/FormList'
 import ShareForm from '../components/ShareForm';
+import SharedFormsList from '../components/SharedFormsList';  
 
 const UsersPage = () => {
   const [refresh, setRefresh] = useState(false);
@@ -16,6 +17,7 @@ const UsersPage = () => {
       <FormForm />
       <FormList />
       <ShareForm />
+      <SharedFormsList userId={31} />
     </Container>
   );
 }
