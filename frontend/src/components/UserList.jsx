@@ -1,21 +1,12 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { List, ListItem, ListItemText, Typography } from '@mui/material';
-import { getUsers } from '../services/user-service';
+import { useUserContext } from "../contexts/user-contex";
+
 
 const UserList = () => {
-    const [users, setUsers] = useState([]);
-
+    const {users ,fetchUsers} = useUserContext();
+    
     useEffect(() => {
-        const fetchUsers = async () => {
-            try {
-                const response = await getUsers();
-                console.log("Dados da API:", response.data); // Depuração
-
-                setUsers(response.data.users);
-            } catch (error) {
-                console.log('erro ao buscar usuários', error);
-            }
-        };
         fetchUsers();
     }, []);
 
@@ -23,8 +14,8 @@ const UserList = () => {
         <div>
             <Typography variant="h6" gutterBottom>Usuários Cadastrados</Typography>
             <List>
-                {users.map((user) => (
-                    <ListItem key={user.id}>
+                {users.map((user, index) => (
+                    <ListItem key={index}>
                         <ListItemText primary={user.name} secondary={`ID: ${user.id}`} />
                     </ListItem>
                 ))}

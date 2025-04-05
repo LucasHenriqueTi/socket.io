@@ -8,13 +8,12 @@ const UserProvider = ({ children }) => {
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(false);
 
-    // Função para buscar usuários
     // useCallback é usado para memorizar a função e evitar que ela seja recriada em cada renderização
     const fetchUsers = useCallback(async () => {
         setLoading(true);
         try {
             const response = await getUsers();
-            setUsers(response.data);
+            setUsers(response.data.users);
         } catch (error) {
             console.error('Error fetching users:', error);
         } finally {
@@ -27,6 +26,7 @@ const UserProvider = ({ children }) => {
     const addUser = useCallback(async (name) => {
         const response = await createUser({name});
         setUsers(prev => [...prev, response.data]);
+        await fetchUsers();
         return response;
     },[]);
 

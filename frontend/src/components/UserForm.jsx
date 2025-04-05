@@ -1,14 +1,16 @@
 import { useState } from "react";
 import { TextField, Button, Box, Typography } from "@mui/material";
-import {createUser, deleteAllUsers} from "../services/user-service";
+import { deleteAllUsers} from "../services/user-service";
+import { useUserContext } from "../contexts/user-contex";
 
 const UserForm = ({onUserCreated}) => {
+    const {addUser} = useUserContext();
     const [name, setName] = useState('');
 
     const handleSubmit = async (e) =>{
         e.preventDefault();
         try {
-            await createUser({name});
+            await addUser(name);
             console.log('usuário criado', name)
             setName('');
             onUserCreated();
