@@ -47,4 +47,4 @@ const SharedFormsList = ({userId}) => {
     
 }
 
-export default SharedFormsList;
+export default SharedFormsList
