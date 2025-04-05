@@ -3,6 +3,7 @@ import { TextField, Button, Box, Typography } from "@mui/material";
 import { deleteAllUsers} from "../services/user-service";
 import { useUserContext } from "../contexts/user-contex";
 
+// criar um novo usuário
 const UserForm = ({onUserCreated}) => {
     const {addUser} = useUserContext();
     const [name, setName] = useState('');

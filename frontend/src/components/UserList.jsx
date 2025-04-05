@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { List, ListItem, ListItemText, Typography } from '@mui/material';
 import { useUserContext } from "../contexts/user-contex";
 
-
+// listar usuários
 const UserList = () => {
     const {users ,fetchUsers} = useUserContext();
     
