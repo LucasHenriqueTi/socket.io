@@ -1,11 +1,11 @@
-// src/app.jsx
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { ThemeProvider, CssBaseline, Button } from '@mui/material'
 import { lightTheme, darkTheme } from './theme'
 import UsersPage from './pages/UsersPage'
 
+
 export default function App() {
-  const [darkMode, setDarkMode] = useState(false)
+  const [darkMode, setDarkMode] = useState(true)
 
   const toggleTheme = () => {
     setDarkMode(!darkMode)

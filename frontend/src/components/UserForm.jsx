@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { TextField, Button, Box, Typography } from "@mui/material";
 import { deleteAllUsers} from "../services/user-service";
-import { useUserContext } from "../contexts/user-contex";
+import { useUserContext } from "../contexts/user-context";
 
 // criar um novo usuário
 const UserForm = ({onUserCreated}) => {
