@@ -1,10 +1,8 @@
 import { useEffect, useState } from 'react';
 import { List, ListItem, ListItemText, Typography } from '@mui/material';
 import { useFormContext } from '../contexts/form-context';
-import { useUserContext } from '../contexts/user-context';
 
 const FormList = () => {
-    const { users } = useUserContext();
     const { forms, fetchForms } = useFormContext();
 
     useEffect(() => {
@@ -19,7 +17,7 @@ const FormList = () => {
                     <ListItem key={index}>
                         <ListItemText
                             primary={form.name}
-                            secondary={`ID: ${form.id} | Criado por: ${form.userId}`}
+                            secondary={`ID: ${form.id} | Criado por:  ${form.user?.name ?? 'Desconhecido'}`}
                         />
                     </ListItem>
                 ))}
