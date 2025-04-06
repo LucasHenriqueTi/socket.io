@@ -27,6 +27,7 @@ const FormProvider = ({children}) => {
             setLoading(true);
             const response = await createForm( name, userId );
             setForms(prev => [...prev, response.data]);
+            await fetchForms();
             return response;
         } catch (error) {
             console.error('Erro ao criar formulário:', error);
@@ -34,7 +35,7 @@ const FormProvider = ({children}) => {
         } finally {
             setLoading(false);
         }
-    }, [fetchForms]);
+    }, []);
 
     return (
         <FormContext.Provider value={{ forms, loading, fetchForms, addForm }}>

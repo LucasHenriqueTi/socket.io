@@ -1,21 +1,13 @@
 import { useEffect, useState } from 'react';
 import { List, ListItem, ListItemText, Typography } from '@mui/material';
-import { getForms } from '../services/form-service';
-
+import { useFormContext } from '../contexts/form-context';
+import { useUserContext } from '../contexts/user-context';
 
 const FormList = () => {
-    const [forms, setForms] = useState([]);
+    const { users } = useUserContext();
+    const { forms, fetchForms } = useFormContext();
 
     useEffect(() => {
-        const fetchForms = async () => {
-            try {
-                const response = await getForms();
-                setForms(response.data.forms);
-                console.log('dados do getForms', response)
-            } catch (error) {
-                console.error('erro ao buscar formulários', error);
-            }
-        };
         fetchForms();
     }, []);
 
@@ -23,8 +15,8 @@ const FormList = () => {
         <div>
             <Typography variant="h6" gutterBottom>Formulários</Typography>
             <List>
-                {forms.map((form) => (
-                    <ListItem key={form.id}>
+                {forms.map((form, index) => (
+                    <ListItem key={index}>
                         <ListItemText
                             primary={form.name}
                             secondary={`ID: ${form.id} | Criado por: ${form.userId}`}

@@ -22,7 +22,9 @@ const createForm = async (name, userId) => {
 
 // busca todos os formulários
 const getAllForms = async () => {
-    return await prisma.form.findMany();
+    return await prisma.form.findMany({
+      include: {user: true}
+    });
 }
 
 // buscar formulário por id
