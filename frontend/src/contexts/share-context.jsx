@@ -8,10 +8,10 @@ const SharedFormContext = createContext();
     const [loading, setLoading] = useState(false);
 
     // useState é usado para armazenar o estado do componente
-    const fetchSharedForms = useCallback(async () => {
+    const fetchSharedForms = useCallback(async (userId) => {
         setLoading(true);
         try {
-            const response = await getSharedForms();
+            const response = await getSharedForms(userId);
             setSharedForms(response.data.sharedForms || response.data);
         } catch (error) {
             console.error('Error fetching shared forms:', error);

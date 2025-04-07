@@ -1,10 +1,10 @@
 import { useEffect } from 'react';
 import { List, ListItem, ListItemText, Typography, Chip, Box, CircularProgress, Alert } from '@mui/material';
 import { useSharedFormContext } from '../contexts/share-context';
+import { useAuth } from '../contexts/auth-context'; 
 
-
-// listar os formulários compartilhados com o usuário
-const SharedFormsList = ({ userId }) => {
+// listar os formulários compartilhados com o usuário logado
+const SharedFormsList = () => {
   const { 
     sharedForms, 
     loading, 
@@ -12,13 +12,13 @@ const SharedFormsList = ({ userId }) => {
     fetchSharedForms 
   } = useSharedFormContext();
   
-  
+  const { user } = useAuth();
 
   useEffect(() => {
-    if (userId) {
-      fetchSharedForms(userId);
+    if (user?.userId) {
+      fetchSharedForms(user.userId);
     }
-  }, [userId, fetchSharedForms]);
+  }, [user?.userId, fetchSharedForms]);
 
   if (loading) {
     return (
@@ -55,7 +55,7 @@ const SharedFormsList = ({ userId }) => {
                 secondary={
                   <Box component="span" sx={{ display: 'flex', alignItems: 'center', mt: 1 }}>
                     <Typography component="span" variant="body2">
-                      Compartilhado por: {shared.sender?.name || `ID: ${shared.senderId}`}
+                      Compartilhado por: {sharedForms.form?.userId || `ID: ${shared.senderId}`}
                     </Typography>
                     <Chip
                       label={`ID: ${shared.formId}`}
