@@ -1,16 +1,9 @@
 import { useEffect } from 'react';
-import { 
-  List, 
-  ListItem, 
-  ListItemText, 
-  Typography, 
-  Chip, 
-  Box,
-  CircularProgress,
-  Alert
-} from '@mui/material';
+import { List, ListItem, ListItemText, Typography, Chip, Box, CircularProgress, Alert } from '@mui/material';
 import { useSharedFormContext } from '../contexts/share-context';
 
+
+// listar os formulários compartilhados com o usuário
 const SharedFormsList = ({ userId }) => {
   const { 
     sharedForms, 
