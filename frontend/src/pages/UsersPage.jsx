@@ -17,7 +17,7 @@ const UsersPage = () => {
       <FormForm />
       <FormList />
       <ShareForm />
-      <SharedFormsList userId={1} />
+      <SharedFormsList />
     </Container>
   );
 }

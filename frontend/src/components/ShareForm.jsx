@@ -1,50 +1,54 @@
-import { useState, useEffect } from 'react';
-import { Button, MenuItem, Box, Typography, TextField } from '@mui/material';
-
-import { shareForm } from '../services/shared-form-service';
-import { getForms } from '../services/form-service'
-import { getUsers } from '../services/user-service'
+import { useState } from 'react';
+import { Button, MenuItem, Box, Typography, TextField, CircularProgress, Alert } from '@mui/material';
+import { useSharedFormContext } from '../contexts/share-context';
+import { useFormContext } from '../contexts/form-context';
+import { useUserContext } from '../contexts/user-context';
 
 const ShareForm = () => {
-    const [formId, setFormId] = useState('');
-    const [userId, setUserId] = useState('');
-    const [forms, setForms] = useState([]);
-    const [users, setUsers] = useState([]);
+  const [formId, setFormId] = useState('');
+  const [userId, setUserId] = useState('');
+  const [error, setError] = useState(null);
+  const [success, setSuccess] = useState(null);
 
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const [formsRes, usersRes] = await Promise.all([
-                    getForms(),
-                    getUsers()
-                ]);
-                setForms(formsRes.data.forms);
-                setUsers(usersRes.data.users);
-            }catch (error) {
-                console.error('erro ao buscar dados', error)
-            }
-        };
-        fetchData();
-    }, []);
+  // Utilizando os contextos
+  const { shareForm, loading } = useSharedFormContext();
+  const { forms, loading: formsLoading } = useFormContext();
+  const { users, loading: usersLoading } = useUserContext();
 
-    const handleShare = async () => {
-        try {
-            await shareForm({
-                formId: Number(formId),
-                userId: Number(userId)
-            });
-            alert('formulário compartilhado com sucesso!');
-            setFormId('');
-            setUserId('');
-            console.log('formulário compartilhado com sucesso!', formId, userId);
-        } catch (error) {
-            console.error('error ao compatilhar formulário', error)
-        }
+  
+
+  const handleShare = async () => {
+    setError(null);
+    setSuccess(null);
+
+    try {
+      await shareForm(Number(formId), Number(userId));
+      setSuccess('Formulário compartilhado com sucesso!');
+      setFormId('');
+      setUserId('');
+    } catch (error) {
+      setError(error.message || 'Erro ao compartilhar formulário');
     }
+  };
 
-    return (
-<Box>
-      <Typography variant="h6" gutterBottom>Compartilhar Formulário</Typography>
+  return (
+    <Box>
+      <Typography variant="h6" gutterBottom>
+        Compartilhar Formulário
+      </Typography>
+
+      {error && (
+        <Alert severity="error" sx={{ mb: 2 }}>
+          {error}
+        </Alert>
+      )}
+
+      {success && (
+        <Alert severity="success" sx={{ mb: 2 }}>
+          {success}
+        </Alert>
+      )}
+
       <TextField
         select
         label="Formulário"
@@ -52,13 +56,21 @@ const ShareForm = () => {
         onChange={(e) => setFormId(e.target.value)}
         fullWidth
         margin="normal"
+        disabled={formsLoading}
       >
-        {forms.map((form) => (
-          <MenuItem key={form.id} value={form.id}>
-            {form.name} (ID: {form.id})
+        {formsLoading ? (
+          <MenuItem disabled>
+            <CircularProgress size={24} />
           </MenuItem>
-        ))}
+        ) : (
+          forms.map((form) => (
+            <MenuItem key={form.id} value={form.id}>
+              {form.name} (ID: {form.id})
+            </MenuItem>
+          ))
+        )}
       </TextField>
+
       <TextField
         select
         label="Usuário"
@@ -66,24 +78,32 @@ const ShareForm = () => {
         onChange={(e) => setUserId(e.target.value)}
         fullWidth
         margin="normal"
+        disabled={usersLoading}
       >
-        {users.map((user) => (
-          <MenuItem key={user.id} value={user.id}>
-            {user.name} (ID: {user.id})
+        {usersLoading ? (
+          <MenuItem disabled>
+            <CircularProgress size={24} />
           </MenuItem>
-        ))}
+        ) : (
+          users.map((user) => (
+            <MenuItem key={user.id} value={user.id}>
+              {user.name} (ID: {user.id})
+            </MenuItem>
+          ))
+        )}
       </TextField>
-      <Button 
-        variant="contained" 
-        color="primary" 
+
+      <Button
+        variant="contained"
+        color="primary"
         onClick={handleShare}
-        disabled={!formId || !userId}
+        disabled={!formId || !userId || loading}
         sx={{ mt: 2 }}
       >
-        Compartilhar
+        {loading ? <CircularProgress size={24} /> : 'Compartilhar'}
       </Button>
     </Box>
-    );
-}
+  );
+};
 
 export default ShareForm;
