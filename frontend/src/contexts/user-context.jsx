@@ -19,7 +19,7 @@ const UserProvider = ({ children }) => {
         } finally {
             setLoading(false);
         }
-    });
+    }, []);
 
     // Função para adicionar um novo usuário
     // O useCallback é usado para evitar que a função seja recriada em cada renderização

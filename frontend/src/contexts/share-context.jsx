@@ -3,32 +3,35 @@ import { shareForm as shareFormApi, getSharedForms } from '../services/shared-fo
 
 const SharedFormContext = createContext();
 
- const SharedFormProvider = ({ children }) => {
+const SharedFormProvider = ({ children }) => {
     const [sharedForms, setSharedForms] = useState([]);
     const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
 
-    // useState é usado para armazenar o estado do componente
     const fetchSharedForms = useCallback(async (userId) => {
         setLoading(true);
+        setError(null);
         try {
             const response = await getSharedForms(userId);
-            setSharedForms(response.data.sharedForms || response.data);
+            setSharedForms(response.data.sharedForms || []);
         } catch (error) {
-            console.error('Error fetching shared forms:', error);
+            console.error('Erro ao buscar formulários compartilhados:', error);
+            setError('Falha ao carregar formulários compartilhados');
         } finally {
             setLoading(false);
         }
     }, []);
     
-    // useCallback é usado para memorizar a função e evitar recriações desnecessárias
     const shareForm = useCallback(async (formId, userId) => {
         try {
             setLoading(true);
+            setError(null);
             const response = await shareFormApi({ formId, userId });
             setSharedForms(prev => [...prev, response.data]);
             return response;
         } catch (error) {
-            console.error('Error sharing form:', error);
+            console.error('Erro ao compartilhar formulário:', error);
+            setError('Falha ao compartilhar formulário');
             throw error;
         } finally {
             setLoading(false);
@@ -39,6 +42,7 @@ const SharedFormContext = createContext();
         <SharedFormContext.Provider value={{ 
             sharedForms, 
             loading, 
+            error,
             fetchSharedForms, 
             shareForm 
         }}>
@@ -50,7 +54,7 @@ const SharedFormContext = createContext();
 export const useSharedFormContext = () => {
     const context = useContext(SharedFormContext);
     if (!context) {
-        throw new Error('useSharedFormContext must be used within a SharedFormProvider');
+        throw new Error('useSharedFormContext deve ser usado dentro de um SharedFormProvider');
     }
     return context;
 };

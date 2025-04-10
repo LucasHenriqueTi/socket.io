@@ -1,26 +1,49 @@
 import { useEffect } from 'react';
 import { List, ListItem, ListItemText, Typography, Chip, Box, CircularProgress, Alert } from '@mui/material';
 import { useSharedFormContext } from '../contexts/share-context';
-import { useAuth } from '../contexts/auth-context'; 
+import { useAuth } from '../contexts/auth-context';
+import { useUserContext } from '../contexts/user-context';
 
-// listar os formulários compartilhados com o usuário logado
 const SharedFormsList = () => {
   const { 
     sharedForms, 
-    loading, 
-    error,
+    loading: sharedFormsLoading, 
+    error: sharedFormsError,
     fetchSharedForms 
   } = useSharedFormContext();
   
   const { user } = useAuth();
+  const { users, loading: usersLoading, error: usersError, fetchUsers } = useUserContext();
 
   useEffect(() => {
     if (user?.userId) {
       fetchSharedForms(user.userId);
+      fetchUsers();
     }
-  }, [user?.userId, fetchSharedForms]);
+  }, [user?.userId, fetchSharedForms, fetchUsers]);
 
-  if (loading) {
+  const getSenderName = (senderId) => {
+    try {
+      if (!users || !Array.isArray(users)) {
+        console.log('Users não está disponível ou não é array', users);
+        return `Usuário ${senderId}`;
+      }
+      
+      // Converter para string para comparação segura
+      const sender = users.find(u => String(u.id) === String(senderId));
+      
+      if (!sender) {
+        console.warn(`Usuário com ID ${senderId} não encontrado. Usuários disponíveis:`, users);
+      }
+      
+      return sender?.name || `Usuário ${senderId}`;
+    } catch (error) {
+      console.error('Erro ao obter nome do remetente:', error);
+      return `Usuário ${senderId}`;
+    }
+  };
+
+  if (sharedFormsLoading || usersLoading) {
     return (
       <Box display="flex" justifyContent="center" my={4}>
         <CircularProgress />
@@ -28,10 +51,10 @@ const SharedFormsList = () => {
     );
   }
 
-  if (error) {
+  if (sharedFormsError || usersError) {
     return (
       <Alert severity="error" sx={{ mb: 3 }}>
-        {error}
+        {sharedFormsError || usersError || 'Erro ao carregar dados'}
       </Alert>
     );
   }
@@ -42,7 +65,7 @@ const SharedFormsList = () => {
         Formulários Compartilhados com Você
       </Typography>
       
-      {sharedForms.length === 0 ? (
+      {!sharedForms || sharedForms.length === 0 ? (
         <Typography variant="body2" color="text.secondary">
           Nenhum formulário compartilhado ainda.
         </Typography>
@@ -55,13 +78,22 @@ const SharedFormsList = () => {
                 secondary={
                   <Box component="span" sx={{ display: 'flex', alignItems: 'center', mt: 1 }}>
                     <Typography component="span" variant="body2">
-                      Compartilhado por: {sharedForms.form?.userId || `ID: ${shared.senderId}`}
+                      {/* Aqui usamos form.userId como senderId */}
+                      Compartilhado por: {getSenderName(shared.form?.userId)}
                     </Typography>
+                    {shared.formId && (
+                      <Chip
+                        label={`ID Form: ${shared.formId}`}
+                        size="small"
+                        sx={{ ml: 1 }}
+                        color="primary"
+                      />
+                    )}
                     <Chip
-                      label={`ID: ${shared.formId}`}
+                      label={`ID Compart.: ${shared.id}`}
                       size="small"
                       sx={{ ml: 1 }}
-                      color="primary"
+                      color="secondary"
                     />
                   </Box>
                 }
