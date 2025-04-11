@@ -7,8 +7,12 @@ const AuthProvider = ({ children }) => {
 
   const login = (userData) => {
     localStorage.setItem('user', JSON.stringify(userData));
+    localStorage.setItem('token', userData.token);
     setUser(userData);
+  
   };
+  
+  
 
   const logout = () => {
     localStorage.removeItem('user');
@@ -17,19 +21,22 @@ const AuthProvider = ({ children }) => {
 
   // Verifica se já está logado ao carregar
   useEffect(() => {
-    const storedUser = localStorage.getItem('user');
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
+    const stored = localStorage.getItem('user');
+    if (stored) {
+      setUser(JSON.parse(stored));
     }
   }, []);
+  
 
   return (
-    <AuthContext.Provider value={{ 
-      user,
+    <AuthContext.Provider value={{
+      user: user?.user,
+      token: user?.token,
       login,
       logout,
       isAuthenticated: !!user
     }}>
+    
       {children}
     </AuthContext.Provider>
   );

@@ -11,11 +11,11 @@ const configureSharedFormHandlers = (io, socket) => {
     });
 
     // Notificar compartilhamento
-    socket.on('share-form', async ({ formId, recipientId, senderId }) => {
+    socket.on('share-form', async ({ formId, userId, senderId }) => {
         try {
-            const sharedForm = await shareForm(formId, senderId, recipientId);
+            const sharedForm = await shareForm(formId, senderId, userId);
             
-            const recipientSocketId = userConnections.get(recipientId);
+            const recipientSocketId = userConnections.get(userId);
             if (recipientSocketId) {
                 io.to(recipientSocketId).emit('form-shared', {
                     formId,

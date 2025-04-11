@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { TextField, Button, Box, Alert } from '@mui/material';
 import { useAuth } from '../contexts/auth-context';
 import { useNavigate } from 'react-router-dom';
-import { getUsers } from '../services/user-service';
+import axios from 'axios';
 
 
 const Login = () => {
@@ -11,27 +11,22 @@ const Login = () => {
   const { login } = useAuth();
   const navigate = useNavigate();
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      const response = await getUsers();
-      
-      const user = response.data.users.find(u => u.name === username);
-      
-      if (!user) {
-        throw new Error('Usuário não encontrado');
-      }
 
-      login({
-        name: user.name,
-        userId: user.id
-      });
-      
-      navigate('/');
-    } catch (error) {
-      setError(error.message);
-    }
-  };
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  try {
+    const response = await axios.post('http://localhost:3001/api/login', { name: username});
+
+    const { user, token } = response.data;
+
+    login({ ...user, token }); // agora tem token de verdade
+
+    navigate('/');
+  } catch (error) {
+    setError(error.response?.data?.message || 'Erro ao fazer login');
+  }
+};
+
 
   return (
     <Box sx={{ maxWidth: 400, mx: 'auto', mt: 8, p: 3 }}>
