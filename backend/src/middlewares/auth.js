@@ -5,7 +5,7 @@ const login = async (req, res) => {
   const { name } = req.body;
 
   try {
-    const users = await getAllUser(); // Aqui você busca usuários do banco ou do mock
+    const users = await getAllUser(); // k
     const user = users.find(u => u.name === name);
 
     if (!user) return res.status(404).json({ message: 'Usuário não encontrado' });

@@ -31,6 +31,7 @@ const SocketProvider = ({ children }) => {
     }
   };
 
+  
   const addNotification = (notification) => {
     setNotifications((prev) => [...prev, notification]);
   };
