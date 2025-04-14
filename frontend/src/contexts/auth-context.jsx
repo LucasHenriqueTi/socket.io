@@ -30,7 +30,7 @@ const AuthProvider = ({ children }) => {
 
   return (
     <AuthContext.Provider value={{
-      user: user?.user,
+      user: user,
       token: user?.token,
       login,
       logout,
