@@ -11,7 +11,11 @@ const shareFormWithUser = async (formId, userId) => {
 const getSharedFormsByUser = async (userId) => {
     return await prisma.sharedForm.findMany({
         where: {userId: parseInt(userId, 10)},
-        include: { form: true }
+        include: { form: {
+            include: {
+                user:true
+            }
+        } }
     });
 }
 
