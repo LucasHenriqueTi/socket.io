@@ -95,20 +95,18 @@ const SharedFormsList = () => {
       ) : (
         <Grid container spacing={2}>
           {sharedForms.map((item, index) => {
-            const form = forms.find(f => f.id === item.formId);
-            if (!form) return null;
+            const form = item.form;
+            const sender = form?.user;
 
-            const sender = users.find(u => u.id === form.userId);
-            
             return (
-              <Grid item xs={12} sm={6} md={4} key={`${form.id}-${index}`}>
+              <Grid item xs={12} sm={6} md={4} key={`${form?.id}-${index}`}>
                 <Card variant="outlined">
                   <CardContent>
                     <Typography variant="h6">
-                      {form.name || `Formulário ID: ${form.id}`}
+                      {form?.name || `Formulário ID: ${form?.id}`}
                     </Typography>
                     <Typography variant="body2" color="textSecondary">
-                      ID do Formulário: {form.id}
+                      ID do Formulário: {form?.id}
                     </Typography>
                     <Typography variant="body2" color="textSecondary">
                       Compartilhado por: {sender?.name || 'Desconhecido'}
@@ -118,6 +116,7 @@ const SharedFormsList = () => {
               </Grid>
             );
           })}
+
         </Grid>
       )}
 

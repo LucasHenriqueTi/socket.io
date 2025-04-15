@@ -7,7 +7,7 @@ const shareFormWithUser = async (formId, userId) => {
     });
 };
 
-// buscar formulários compartilhados por usuário
+// buscar formulários compartilhados com o usuário
 const getSharedFormsByUser = async (userId) => {
     return await prisma.sharedForm.findMany({
         where: {userId: parseInt(userId, 10)},

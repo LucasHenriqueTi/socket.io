@@ -3,7 +3,6 @@ import { shareForm, getSharedForms } from '../services/shared-form-service.js';
 
 const shareFormWithUser = async (req, res) => {
     const { formId, userId } = req.body;  // Padronizado para userId
-    const senderId = req.user.id;
 
     // Validação básica
     if (!formId || !userId || isNaN(formId) || isNaN(userId)) {
@@ -12,7 +11,7 @@ const shareFormWithUser = async (req, res) => {
 
     try {
         // Compartilha o formulário
-        const sharedForm = await shareForm(formId, senderId, userId);
+        const sharedForm = await shareForm(formId, userId);
         
         res.status(201).json({ 
             success: true, 
