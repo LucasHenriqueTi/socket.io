@@ -1,9 +1,11 @@
 import { createContext, useContext, useState, useEffect } from 'react';
+import { useSocket } from './socket-context';
 
 const AuthContext = createContext();
 
 const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
+  const {socket, registerUser} = useSocket
 
   const login = (userData) => {
     localStorage.setItem('user', JSON.stringify(userData));
@@ -12,6 +14,12 @@ const AuthProvider = ({ children }) => {
   
   };
   
+  // inicia a room do usuário autenticado
+  useEffect(() => {
+    if (user?.id && socket) {
+      registerUser(user.id);
+    }
+  }, [user, socket]);
   
 
   const logout = () => {
