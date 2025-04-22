@@ -1,10 +1,12 @@
 import api from './api';
+import Cookie from 'js-cookie';
+
 
 // Função para compartilhar um formulário com outro usuário
 const shareForm = ({formId, userId}) => {
   return api.post('/share', { formId, userId}, {
     headers: {
-      'Authorization': `Bearer ${localStorage.getItem('token')}`
+      'Authorization': `Bearer ${Cookie.get('token')}`
     }
   });
 };
@@ -13,7 +15,7 @@ const shareForm = ({formId, userId}) => {
 const getSharedForms = (userId) => {
   return api.get(`/shared-forms/${userId}`, {
     headers: {
-      'Authorization': `Bearer ${localStorage.getItem('token')}`
+      'Authorization': `Bearer ${Cookie.get('token')}`
     }
   });
 };
