@@ -4,9 +4,15 @@ import UsersPage from '../pages/UsersPage'
 import Login from '../pages/Login'
 
 const PrivateRoute = ({ children }) => {
-  const { isAuthenticated } = useAuth()
-  return isAuthenticated ? children : <Navigate to="/login" replace />
-}
+  const { isAuthenticated, loading } = useAuth();
+
+  if (loading) {
+    return <div>Carregando...</div>; // Ou um spinner bonitinho com MUI se quiser
+  }
+
+  return isAuthenticated ? children : <Navigate to="/login" replace />;
+};
+
 
 const AppRoutes = () => {
   return (

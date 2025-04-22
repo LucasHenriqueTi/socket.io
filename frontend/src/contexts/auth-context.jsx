@@ -6,6 +6,7 @@ const AuthContext = createContext();
 
 const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
   const { socket, registerUser } = useSocket();
 
   const login = (userData) => {
@@ -29,14 +30,17 @@ const AuthProvider = ({ children }) => {
   useEffect(() => {
     const stored = localStorage.getItem('user');
     const token = Cookies.get('token');
-
+  
     if (stored && token) {
       const parsed = JSON.parse(stored);
       setUser(parsed);
     } else {
       setUser(null);
     }
+  
+    setLoading(false); 
   }, []);
+  
 
   return (
     <AuthContext.Provider
@@ -45,6 +49,7 @@ const AuthProvider = ({ children }) => {
         token: user?.token,
         login,
         logout,
+        loading,
         isAuthenticated: !!user,
       }}
     >
