@@ -2,8 +2,8 @@ import api from './api';
 import Cookie from 'js-cookie';
 
 // criar formulário 
-const createForm = (formData) =>
-    api.post('/forms', { formData },
+const createForm = ({name, userId}) =>
+    api.post('/forms', { name, userId },
         {
             headers: {
                 'Authorization': `Bearer ${Cookie.get('token')}`

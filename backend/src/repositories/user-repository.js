@@ -2,7 +2,7 @@ import prisma from '../config/db.js'
 
 // cria um usuário
 const createUser= async (name) => {
-    return await prisma.user.create({data:{name}});
+    return await prisma.user.create({data:name});
 };
 
 // busca todos os usuários

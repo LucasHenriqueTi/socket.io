@@ -11,15 +11,15 @@ const router = express.Router();
 router.post('/login', login); 
 
 // Rotas de Usuário
-router.post('/users',  createUser);
-router.post('/delete-all',  deleteAllUsers)
-router.get('/users',  getAllUsers);
-router.get('/users/:userId', getUserDetails);
+router.post('/users',authenticate,  createUser);
+router.post('/delete-all',authenticate,  deleteAllUsers)
+router.get('/users',authenticate,  getAllUsers);
+router.get('/users/:userId',authenticate, getUserDetails);
 
 // Rotas de Formulário
-router.post('/forms', createForm);
-router.get('/forms', getAllForms);
-router.get('/forms/:formId', getFormDetails);
+router.post('/forms',authenticate, createForm);
+router.get('/forms',authenticate, getAllForms);
+router.get('/forms/:formId',authenticate, getFormDetails);
 
 // Rotas de Compartilhamento
 router.post('/share', authenticate,shareFormWithUser);
