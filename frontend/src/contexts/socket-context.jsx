@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from 'react';
+import { createContext, useContext, useEffect, useState, useCallback, useRef } from 'react';
 import { io } from 'socket.io-client';
 
 const SocketContext = createContext(null);
@@ -6,73 +6,140 @@ const SocketContext = createContext(null);
 const SocketProvider = ({ children }) => {
   const [socket, setSocket] = useState(null);
   const [isConnected, setIsConnected] = useState(false);
+  const [notifications, setNotifications] = useState([]);
+  const connectionRef = useRef(false);
 
-  // Conecta o socket com autenticação
-  const connectSocket = (userId) => {
+
+  const resetSocketAuth = useCallback(() => {
+    if (socket) {
+      socket.auth = (cb) => cb({ token: null });
+    }
+  }, [socket]);
+
+  console.log('[SocketContext] Estado atual:', { isConnected, notifications: notifications.length });
+
+  const connectSocket = useCallback((userId) => {
+    console.log('[SocketContext] connectSocket chamado para userId:', userId);
+
     if (socket && !isConnected) {
+      console.log('[SocketContext] Conectando socket...');
       socket.auth = { userId };
       socket.connect();
+    } else {
+      console.warn('[SocketContext] Socket não disponível ou já conectado');
     }
-  };
+  }, [socket, isConnected]);
 
-  // Desconecta o socket
-  const disconnectSocket = () => {
-    if (socket && isConnected) {
+  const disconnectSocket = useCallback(() => {
+    console.log('[SocketContext] disconnectSocket chamado');
+    if (socket) {
+      console.log('[SocketContext] Desconectando socket...');
+      resetSocketAuth();
       socket.disconnect();
     }
-  };
+  }, [socket, resetSocketAuth]);
+
+  const markNotificationAsRead = useCallback((notificationId) => {
+    console.log('[SocketContext] Marcando notificação como lida:', notificationId);
+    setNotifications(prev =>
+      prev.map(n => n.id === notificationId ? { ...n, read: true } : n)
+    );
+  }, []);
+
+  const clearNotifications = useCallback(() => {
+    console.log('[SocketContext] Limpando todas as notificações');
+    setNotifications([]);
+  }, []);
 
   useEffect(() => {
-    const socketUrl ='http://localhost:3001';
-    
-    // Cria uma nova instância do socket.io
+    console.log('[SocketContext] Iniciando configuração do socket...');
+
+    const socketUrl = 'http://localhost:3001';
+    console.log('[SocketContext] Conectando a:', socketUrl);
+
     const newSocket = io(socketUrl, {
-      autoConnect: false,
+      autoConnect: false, // Importante manter como false
       withCredentials: true,
       transports: ['websocket'],
-      reconnection: true,
-      reconnectionAttempts: 5,
-      reconnectionDelay: 1000,
-      reconnectionDelayMax: 5000,
-    });
-
+      reconnection: false,
+      auth: (cb) => cb({token: null})
+      });
     
-    // Event listeners
+      // Controle de conexão
+    const onConnect = () => {
+      if (!connectionRef.current) {
+        console.log('[SocketContext] Conexão estabelecida');
+        connectionRef.current = true;
+        setIsConnected(true);
+      }
+    };
 
-    // Evento de autenticação
-    newSocket.on('connect', () => {
+    const onDisconnect = (reason) => {
+      if (connectionRef.current) {
+        console.log('[SocketContext] Desconexão:', reason);
+        connectionRef.current = false;
+        setIsConnected(false);
+      }
+    };
+
+    // DEBUG: Monitora eventos de conexão
+    newSocket.on('connect', onConnect, () => {
+      console.log('[SocketContext] Socket conectado com sucesso. ID:', newSocket.id);
       setIsConnected(true);
-      console.log('Socket conectado! ID:', newSocket.id);
     });
 
-    // Evento de desconexão
-    newSocket.on('disconnect', (reason) => {
+    newSocket.on('disconnect', onDisconnect, (reason) => {
+      console.log('[SocketContext] Socket desconectado. Razão:', reason);
       setIsConnected(false);
-      console.log('Socket desconectado. Razão:', reason);
     });
 
-    // Evento de erro de conexão
-    newSocket.on('connect_error', (err) => {
-      console.error('Erro de conexão:', err.message);
+    newSocket.on('connect_error', (error) => {
+      console.error('[SocketContext] Erro de conexão:', error.message);
     });
+
+    // DEBUG: Monitora recebimento de notificações
+    newSocket.on('form-shared', (notification) => {
+      console.log('[SocketContext] Nova notificação recebida:', notification);
+      setNotifications(prev => [{
+        ...notification,
+        read: false,
+        type: 'form-shared'
+      }, ...prev]);
+    });
+
+    // DEBUG: Monitora todas as mensagens recebidas (apenas para desenvolvimento)
+    if (process.env.NODE_ENV === 'development') {
+      newSocket.onAny((event, ...args) => {
+        if (!['pong'].includes(event)) { // Filtra eventos de ping/pong
+          console.debug('[SocketContext] Evento recebido:', event, args);
+        }
+      });
+    }
 
     setSocket(newSocket);
+    console.log('[SocketContext] Socket configurado com sucesso');
 
-    // Conecta o socket quando o componente é montado
     return () => {
-      newSocket.off('connect');
-      newSocket.off('disconnect');
+      console.log('[SocketContext] Limpando socket...');
+      newSocket.off('connect', onConnect);
+      newSocket.off('disconnect', onDisconnect);
+      connectionRef.current = false;
       newSocket.off('connect_error');
+      newSocket.off('form-shared');
       newSocket.disconnect();
     };
   }, []);
 
   return (
-    <SocketContext.Provider value={{ 
-      socket, 
-      isConnected, 
-      connectSocket, 
-      disconnectSocket 
+    <SocketContext.Provider value={{
+      socket,
+      isConnected,
+      notifications,
+      connectSocket,
+      disconnectSocket,
+      markNotificationAsRead,
+      clearNotifications,
+      resetSocketAuth
     }}>
       {children}
     </SocketContext.Provider>

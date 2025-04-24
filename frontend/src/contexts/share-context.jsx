@@ -1,4 +1,3 @@
-// src/contexts/share-context.js
 import { createContext, useContext, useState, useCallback } from 'react';
 import { shareForm as shareFormApi, getSharedForms } from '../services/shared-form-service';
 import { useSocket } from './socket-context';
@@ -25,19 +24,19 @@ const SharedFormProvider = ({ children }) => {
         }
     }, []);
     
-    // shareForm é uma função que compartilha um formulário com um destinatário
-    const shareForm = useCallback(async (formId, userId ) => {
+    // função que compartilha um formulário com um destinatário
+    const shareForm = useCallback(async (formId, recipientId ) => {
         try {
             setLoading(true);
             setError(null);
-            const response = await shareFormApi({ formId, userId });
+            const response = await shareFormApi({ formId, userId: recipientId });
             setSharedForms(prev => [...prev, response.data]);
             
             // Notifica o destinatário via Socket.io se estiver conectado
             if (socket) {
                 socket.emit('share-form', { 
                     formId, 
-                    userId,
+                    recipientId,
                     senderId: response.data.senderId 
                 });
             }

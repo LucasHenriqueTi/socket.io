@@ -1,29 +1,44 @@
-import { useState } from 'react';
-import { Button, MenuItem, Box, Typography, TextField, CircularProgress, Alert } from '@mui/material';
+import { useState, useEffect } from 'react';
+import { useSocket } from '../contexts/socket-context';
 import { useSharedFormContext } from '../contexts/share-context';
 import { useFormContext } from '../contexts/form-context';
 import { useUserContext } from '../contexts/user-context';
+import { Button, MenuItem, Box, Typography, TextField, CircularProgress, Alert, Snackbar } from '@mui/material';
 
 const ShareForm = () => {
   const [formId, setFormId] = useState('');
   const [userId, setUserId] = useState('');
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
-
-  // Utilizando os contextos
+  const { socket } = useSocket();
   const { shareForm, loading } = useSharedFormContext();
   const { forms, loading: formsLoading } = useFormContext();
   const { users, loading: usersLoading } = useUserContext();
-
-  
 
   const handleShare = async () => {
     setError(null);
     setSuccess(null);
 
     try {
+      // 1. Primeiro compartilha no banco de dados
       await shareForm(Number(formId), Number(userId));
-      setSuccess('Formulário compartilhado com sucesso!');
+      
+      // 2. Emite o evento via socket com callback
+      if (socket) {
+        socket.emit('share-form', 
+          { formId: Number(formId), recipientId: Number(userId) },
+          (response) => {
+            if (response.success) {
+              setSuccess(response.message);
+            } else {
+              setError(response.error);
+            }
+          }
+        );
+      } else {
+        setSuccess('Formulário compartilhado (usuário offline será notificado quando se conectar)');
+      }
+      
       setFormId('');
       setUserId('');
     } catch (error) {
@@ -32,22 +47,10 @@ const ShareForm = () => {
   };
 
   return (
-    <Box>
+    <Box sx={{ p: 3 }}>
       <Typography variant="h6" gutterBottom>
         Compartilhar Formulário
       </Typography>
-
-      {error && (
-        <Alert severity="error" sx={{ mb: 2 }}>
-          {error}
-        </Alert>
-      )}
-
-      {success && (
-        <Alert severity="success" sx={{ mb: 2 }}>
-          {success}
-        </Alert>
-      )}
 
       <TextField
         select
@@ -102,6 +105,26 @@ const ShareForm = () => {
       >
         {loading ? <CircularProgress size={24} /> : 'Compartilhar'}
       </Button>
+
+      <Snackbar
+        open={!!error}
+        autoHideDuration={6000}
+        onClose={() => setError(null)}
+      >
+        <Alert severity="error" onClose={() => setError(null)}>
+          {error}
+        </Alert>
+      </Snackbar>
+
+      <Snackbar
+        open={!!success}
+        autoHideDuration={6000}
+        onClose={() => setSuccess(null)}
+      >
+        <Alert severity="success" onClose={() => setSuccess(null)}>
+          {success}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 };

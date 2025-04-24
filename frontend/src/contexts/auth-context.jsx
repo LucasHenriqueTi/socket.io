@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { useSocket } from './socket-context';
 import Cookies from 'js-cookie';
 
@@ -9,66 +9,49 @@ const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const { socket, isConnected, connectSocket, disconnectSocket } = useSocket();
 
-  // Efeito principal que gerencia a conexão do socket
-  useEffect(() => {
-    const storedUser = localStorage.getItem('user');
-    const token = Cookies.get('token');
-    
-    // Verifica se o usuário está autenticado
-    if (storedUser && token) {
-      const parsedUser = JSON.parse(storedUser);
-      setUser(parsedUser);
-      
-      // Reconecta automaticamente se o usuário está autenticado
-      if (socket && !isConnected) {
-        console.log('Reconectando socket para usuário autenticado...');
-        connectSocket(parsedUser.id);
-      }
-    } else {
-      setLoading(false);
-    }
-  }, [socket, isConnected, connectSocket]);
-
-  // Monitora mudanças na conexão do socket
-  useEffect(() => {
-    if (socket) {
-      const handleConnect = () => {
-        console.log('Socket conectado - usuário:', user?.id);
-        setLoading(false);
-      };
-
-      const handleDisconnect = () => {
-        console.log('Socket desconectado');
-      };
-
-      socket.on('connect', handleConnect);
-      socket.on('disconnect', handleDisconnect);
-
-      return () => {
-        socket.off('connect', handleConnect);
-        socket.off('disconnect', handleDisconnect);
-      };
-    }
-  }, [socket, user]);
-
-  // Função de login que armazena o usuário no localStorage e define o token no cookie
-  const login = async (userData) => {
+  const login = useCallback((userData) => {
     localStorage.setItem('user', JSON.stringify(userData));
     Cookies.set('token', userData.token);
     setUser(userData);
     
     if (socket) {
-      connectSocket(userData.id);
+      console.log('[Auth] Configurando autenticação do socket');
+      socket.auth = (cb) => cb({ userId: userData.id });
+      if (!socket.connected) {
+        socket.connect();
+      }
     }
-  };
+  }, [socket]);
 
-  // Função de logout que remove o usuário do localStorage e o token do cookie
-  const logout = () => {
+  const logout = useCallback(() => {
     disconnectSocket();
     localStorage.removeItem('user');
     Cookies.remove('token');
     setUser(null);
-  };
+  }, [disconnectSocket]);
+
+  useEffect(() => {
+    const initializeAuth = async () => {
+      const storedUser = localStorage.getItem('user');
+      const token = Cookies.get('token');
+
+      if (storedUser && token) {
+        const parsedUser = JSON.parse(storedUser);
+        setUser(parsedUser);
+        
+        if (socket) {
+          console.log('[Auth] Inicializando conexão do socket');
+          socket.auth = (cb) => cb({ userId: parsedUser.id });
+          if (!socket.connected) {
+            socket.connect();
+          }
+        }
+      }
+      setLoading(false);
+    };
+  
+    initializeAuth();
+  }, [socket]); // Remova connectSocket das dependências
 
   return (
     <AuthContext.Provider

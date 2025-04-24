@@ -6,7 +6,7 @@ import { AuthProvider } from './contexts/auth-context'
 import { useAuth } from './contexts/auth-context'
 import AppRoutes from '../src/router'
 import SocketProvider from './contexts/socket-context'
-
+import NotificationBell from './components/notification-bell'
 
 export default function App() {
   const [darkMode, setDarkMode] = useState(true)
@@ -31,10 +31,10 @@ export default function App() {
                 <Button onClick={handleLogout} variant="contained" color="error">
                   Sair
                 </Button>
+                <NotificationBell />
                 <Button variant="contained" onClick={toggleTheme}>
                   {darkMode ? 'Modo Claro' : 'Modo Escuro'}
                 </Button>
-
               </Box>
 
               <AppRoutes />

@@ -30,44 +30,55 @@ const SharedFormsList = () => {
 
   // Busca os formulários compartilhados do usuário logado
   useEffect(() => {
-    if (user?.id) {
-      fetchSharedForms(user.id);
-    }
-  }, [user, fetchSharedForms]);
-
-  // Busca usuários apenas se não houver
+    if (!user?.id) return;
+  
+    // Variável para controle de montagem
+    let isMounted = true;
+    
+    const fetchData = async () => {
+      try {
+        await fetchSharedForms(user.id);
+        
+        // Verifica se o componente ainda está montado
+        if (isMounted) {
+          if (users.length === 0) await fetchUsers();
+          if (forms.length === 0) await fetchForms();
+        }
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+  
+    // Adiciona um pequeno delay para evitar múltiplas chamadas rápidas
+    const timer = setTimeout(fetchData, 100);
+    
+    return () => {
+      isMounted = false;
+      clearTimeout(timer);
+    };
+    // Remova forms e users das dependências
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id, fetchSharedForms]);
+  
+  // Listener de notificações - mantenha separado
   useEffect(() => {
-    if (users.length === 0) {
-      fetchUsers();
-    }
-  }, [fetchUsers, users.length]);
-
-  // Busca formulários apenas se não houver
-  useEffect(() => {
-    if (forms.length === 0) {
-      fetchForms();
-    }
-  }, [fetchForms, forms.length]);
-
-  // Configura recebimento de notificação via socket
-  useEffect(() => {
-    if (!socket) return;
-
+    if (!socket || !user?.id) return;
+  
     const handleFormShared = (data) => {
-      console.log('Notificação recebida:', data);
       setNotification({
-        message: data.message || 'Novo formulário compartilhado!',
+        message: data.message,
         severity: 'info',
       });
-      fetchSharedForms(user.id); // Atualiza lista
+      // Adiciona delay para evitar concorrência
+      setTimeout(() => fetchSharedForms(user.id), 300);
     };
-
+  
     socket.on('form-shared', handleFormShared);
-
+  
     return () => {
       socket.off('form-shared', handleFormShared);
     };
-  }, [socket, user, fetchSharedForms]);
+  }, [socket, user?.id, fetchSharedForms]);
 
   const handleClose = () => {
     setNotification(null);
