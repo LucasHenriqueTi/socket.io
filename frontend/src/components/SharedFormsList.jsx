@@ -26,7 +26,8 @@ const SharedFormsList = () => {
   const { sharedForms, fetchSharedForms, loading, error } = useSharedFormContext();
   const { users, fetchUsers } = useUserContext();
   const { forms, fetchForms } = useFormContext();
-  const [notification, setNotification] = useState(null);
+  const [notification, setNotification] = useState({ open: false, message: '', severity: 'info' });
+  const [notificationKey, setNotificationKey] = useState(0);
 
   // Busca os formulários compartilhados do usuário logado
   useEffect(() => {
@@ -66,10 +67,11 @@ const SharedFormsList = () => {
   
     const handleFormShared = (data) => {
       setNotification({
-        message: data.message,
-        severity: 'info',
+        open: true,
+        message: data.message || 'Novo formulário compartilhado com você!',
+        severity: 'info'
       });
-      // Adiciona delay para evitar concorrência
+      setNotificationKey(prev => prev + 1); // Força recriação do Snackbar
       setTimeout(() => fetchSharedForms(user.id), 300);
     };
   
@@ -80,8 +82,9 @@ const SharedFormsList = () => {
     };
   }, [socket, user?.id, fetchSharedForms]);
 
-  const handleClose = () => {
-    setNotification(null);
+  const handleClose = (event, reason) => {
+    if (reason === 'clickaway') return;
+    setNotification(prev => ({ ...prev, open: false }));
   };
 
   return (
@@ -131,18 +134,17 @@ const SharedFormsList = () => {
         </Grid>
       )}
 
-      <Snackbar
-        open={!!notification}
-        autoHideDuration={5000}
-        onClose={handleClose}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-      >
-        {notification && (
-          <Alert onClose={handleClose} severity={notification.severity}>
-            {notification.message}
-          </Alert>
-        )}
-      </Snackbar>
+<Snackbar
+  key={notificationKey} // Adicione esta linha
+  open={notification.open}
+  autoHideDuration={6000}
+  onClose={handleClose}
+  anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+>
+  <Alert onClose={handleClose} severity={notification.severity}>
+    {notification.message}
+  </Alert>
+</Snackbar>
     </>
   );
 };
