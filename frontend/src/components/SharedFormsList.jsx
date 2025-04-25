@@ -57,8 +57,6 @@ const SharedFormsList = () => {
       isMounted = false;
       clearTimeout(timer);
     };
-    // Remova forms e users das dependências
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.id, fetchSharedForms]);
   
   // Listener de notificações - mantenha separado
@@ -71,7 +69,7 @@ const SharedFormsList = () => {
         message: data.message || 'Novo formulário compartilhado com você!',
         severity: 'info'
       });
-      setNotificationKey(prev => prev + 1); // Força recriação do Snackbar
+      setNotificationKey(prev => prev + 1);
       setTimeout(() => fetchSharedForms(user.id), 300);
     };
   
@@ -82,6 +80,7 @@ const SharedFormsList = () => {
     };
   }, [socket, user?.id, fetchSharedForms]);
 
+  // Função para fechar a notificação
   const handleClose = (event, reason) => {
     if (reason === 'clickaway') return;
     setNotification(prev => ({ ...prev, open: false }));

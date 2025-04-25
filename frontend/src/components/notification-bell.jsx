@@ -18,10 +18,11 @@ const NotificationBell = () => {
     setAnchorEl(null);
   };
 
+  // função para lidar com o clique na notificação
   const handleNotificationClick = (notification) => {
     markNotificationAsRead(notification.id);
     if (notification.formId) {
-      navigate(`/forms/${notification.formId}`);
+      navigate(`/forms/${notification.formId}`); // Navega para o formulário associado à notificação
     }
     handleClose();
   };

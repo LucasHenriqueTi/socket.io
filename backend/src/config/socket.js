@@ -14,39 +14,44 @@ const configureSocket = (server) => {
   // DEBUG: Monitora conexões ativas
   console.log('[Socket] Iniciando servidor Socket.IO');
 
+  // Mapa para rastrear conexões ativas
   const activeConnections = new Map();
 
+  // Middleware para autenticação e verificação de conexões duplicadas
   io.use(async (socket, next) => {
-  try {
-    const userId = socket.handshake.auth.userId;
-    if (!userId) {
-      console.warn('Conexão rejeitada: sem userId');
-      return next(new Error('Não autenticado'));
-    }
-
-    // Verifica conexões existentes
-    const sockets = await io.in(`user_${userId}`).fetchSockets();
-    sockets.forEach(s => {
-      if (s.id !== socket.id) {
-        console.log(`Desconectando socket duplicado: ${s.id}`);
-        s.disconnect();
+    try {
+      const userId = socket.handshake.auth.userId;
+      if (!userId) {
+        console.warn('Conexão rejeitada: sem userId');
+        return next(new Error('Não autenticado'));
       }
-    });
 
-    socket.userId = userId;
-    next();
-  } catch (error) {
-    console.error('Erro no middleware:', error);
-    next(error);
-  }
-});
-      
-  
+      // Verifica conexões existentes
+      const sockets = await io.in(`user_${userId}`).fetchSockets();
+      sockets.forEach(s => {
+        if (s.id !== socket.id) {
+          console.log(`Desconectando socket duplicado: ${s.id}`);
+          s.disconnect();
+        }
+      });
 
+      // Adiciona nova conexão ao mapa
+      socket.userId = userId;
+      next();
+    } catch (error) {
+      console.error('Erro no middleware:', error);
+      next(error);
+    }
+  });
+
+
+
+  // Evento de conexão do socket
   io.on('connection', (socket) => {
     console.log(`[Socket] Conexão estabelecida - Usuário: ${socket.userId}, SocketID: ${socket.id}`);
     console.log(`[Socket] Conexões ativas: ${activeConnections.size}`);
-    
+
+    // cria uma room para o usuário
     socket.join(`user_${socket.userId}`);
     console.log(`[Socket] Usuário ${socket.userId} entrou na room user_${socket.userId}`);
 
@@ -54,7 +59,7 @@ const configureSocket = (server) => {
     socket.on('share-form', async ({ formId, recipientId }, callback) => {
       try {
         console.log(`[Socket] Evento share-form recebido - FormID: ${formId}, RecipientID: ${recipientId}`);
-        
+
         if (!formId || !recipientId) {
           const errorMsg = 'Dados incompletos para compartilhamento';
           console.warn(`[Socket] ${errorMsg}`, { formId, recipientId });
@@ -100,12 +105,12 @@ const configureSocket = (server) => {
     // DEBUG: Monitora eventos de desconexão
     socket.on('disconnect', (reason) => {
       console.log(`[Socket] Desconexão - Usuário: ${socket.userId}, Razão: ${reason}`);
-      
+
       if (activeConnections.get(socket.userId) === socket) {
         activeConnections.delete(socket.userId);
         console.log(`[Socket] Conexão removida do mapa ativo para usuário ${socket.userId}`);
       }
-      
+
       console.log(`[Socket] Conexões ativas restantes: ${activeConnections.size}`);
     });
 

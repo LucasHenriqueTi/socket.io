@@ -9,11 +9,13 @@ const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const { socket, isConnected, connectSocket, disconnectSocket } = useSocket();
 
+  // função para verificar se o usuário está autenticado
   const login = useCallback((userData) => {
     localStorage.setItem('user', JSON.stringify(userData));
     Cookies.set('token', userData.token);
     setUser(userData);
     
+    // Configurar autenticação do socket
     if (socket) {
       console.log('[Auth] Configurando autenticação do socket');
       socket.auth = (cb) => cb({ userId: userData.id });
@@ -23,6 +25,7 @@ const AuthProvider = ({ children }) => {
     }
   }, [socket]);
 
+  // função para fazer logout do usuário
   const logout = useCallback(() => {
     disconnectSocket();
     localStorage.removeItem('user');
@@ -30,6 +33,7 @@ const AuthProvider = ({ children }) => {
     setUser(null);
   }, [disconnectSocket]);
 
+  // função para verificar se o usuário está autenticado e reconectar o socket em caso de reconexão
   useEffect(() => {
     const initializeAuth = async () => {
       const storedUser = localStorage.getItem('user');
@@ -51,7 +55,7 @@ const AuthProvider = ({ children }) => {
     };
   
     initializeAuth();
-  }, [socket]); // Remova connectSocket das dependências
+  }, [socket]); 
 
   return (
     <AuthContext.Provider

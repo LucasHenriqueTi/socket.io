@@ -9,15 +9,15 @@ const SocketProvider = ({ children }) => {
   const [notifications, setNotifications] = useState([]);
   const connectionRef = useRef(false);
 
-
+  // Função para redefinir a autenticação do socket
   const resetSocketAuth = useCallback(() => {
     if (socket) {
       socket.auth = (cb) => cb({ token: null });
     }
   }, [socket]);
-
   console.log('[SocketContext] Estado atual:', { isConnected, notifications: notifications.length });
 
+  // função para conectar o socket
   const connectSocket = useCallback((userId) => {
     console.log('[SocketContext] connectSocket chamado para userId:', userId);
 
@@ -30,6 +30,7 @@ const SocketProvider = ({ children }) => {
     }
   }, [socket, isConnected]);
 
+  // função para desconectar o socket
   const disconnectSocket = useCallback(() => {
     console.log('[SocketContext] disconnectSocket chamado');
     if (socket) {
@@ -39,6 +40,7 @@ const SocketProvider = ({ children }) => {
     }
   }, [socket, resetSocketAuth]);
 
+  // função para marcar notificação como lida
   const markNotificationAsRead = useCallback((notificationId) => {
     console.log('[SocketContext] Marcando notificação como lida:', notificationId);
     setNotifications(prev =>
@@ -46,11 +48,13 @@ const SocketProvider = ({ children }) => {
     );
   }, []);
 
+  // função para limpar todas as notificações
   const clearNotifications = useCallback(() => {
     console.log('[SocketContext] Limpando todas as notificações');
     setNotifications([]);
   }, []);
 
+  // Efeito para configurar o socket
   useEffect(() => {
     console.log('[SocketContext] Iniciando configuração do socket...');
 
@@ -82,12 +86,13 @@ const SocketProvider = ({ children }) => {
       }
     };
 
-    // DEBUG: Monitora eventos de conexão
+    // estabelece a conexão com o socket
     newSocket.on('connect', onConnect, () => {
       console.log('[SocketContext] Socket conectado com sucesso. ID:', newSocket.id);
       setIsConnected(true);
     });
 
+    // escuta o evento de desconexão
     newSocket.on('disconnect', onDisconnect, (reason) => {
       console.log('[SocketContext] Socket desconectado. Razão:', reason);
       setIsConnected(false);
@@ -97,7 +102,7 @@ const SocketProvider = ({ children }) => {
       console.error('[SocketContext] Erro de conexão:', error.message);
     });
 
-    // DEBUG: Monitora recebimento de notificações
+    // escuta o evento de compartilhamento de formulário
     newSocket.on('form-shared', (notification) => {
       console.log('[SocketContext] Nova notificação recebida:', notification);
       setNotifications(prev => [{
@@ -119,6 +124,7 @@ const SocketProvider = ({ children }) => {
     setSocket(newSocket);
     console.log('[SocketContext] Socket configurado com sucesso');
 
+    // Limpeza do socket ao desmontar o componente
     return () => {
       console.log('[SocketContext] Limpando socket...');
       newSocket.off('connect', onConnect);
