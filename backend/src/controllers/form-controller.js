@@ -4,7 +4,6 @@ import { registerForm, getForm, getAllFroms } from '../services/form-service.js'
 const createForm = async (req, res) => {
     const { name, userId } = req.body;
   
-    // Validação explícita
     if (!name || !userId) {
       return res.status(400).json({ 
         success: false, 

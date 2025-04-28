@@ -1,10 +1,10 @@
 import { shareForm, getSharedForms } from '../services/shared-form-service.js';
 
 
+// Compartilha um formulário com um usuário específico
 const shareFormWithUser = async (req, res) => {
-    const { formId, userId } = req.body;  // Padronizado para userId
+    const { formId, userId } = req.body;  
 
-    // Validação básica
     if (!formId || !userId || isNaN(formId) || isNaN(userId)) {
         return res.status(400).json({ success: false, error: 'IDs inválidos' });
     }
@@ -26,6 +26,7 @@ const shareFormWithUser = async (req, res) => {
     }
 };
 
+// Obtém os formulários compartilhados com um usuário específico
 const getSharedFormsByUser = async (req, res) => {
     const { userId } = req.params;
 

@@ -1,13 +1,16 @@
+
 class NotificationService {
   constructor(io) {
       this.io = io;
       this.userConnections = new Map();
   }
 
+  // Método para registrar um usuário e seu socketId
   registerUser(userId, socketId) {
       this.userConnections.set(userId, socketId);
   }
 
+  // Método para obter o socketId de um usuário
   unregisterUser(userId) {
       this.userConnections.delete(userId);
   }
