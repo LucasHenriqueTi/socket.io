@@ -36,7 +36,7 @@ const getUserDetails = async (req, res) => {
     }
 };
 
-// deleta todos os usuários
+// deleta todos os dados do banco
 const deleteAllUsers = async (req, res) => {
     try {
         const deleteAll = await deleteUsers();

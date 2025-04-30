@@ -27,7 +27,7 @@ const getUserById = (userId) =>
 
 // Deleta todos os Usuários 
 const deleteAllUsers = () =>
-    api.post(`/delete-all`, {
+    api.post(`/delete-all`, null,  {
         headers: {
             'Authorization': `Bearer ${Cookie.get('token')}`
         }
