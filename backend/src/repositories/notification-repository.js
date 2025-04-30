@@ -65,6 +65,7 @@ const markNotificationAsRead = async (notificationId) => {
     });
 };
 
+// deleta uma notificação pelo ID
 const deleteNotificationById = async (notificationId) => {
     return await prisma.notification.delete({
         where: { id: parseInt(notificationId, 10) }
