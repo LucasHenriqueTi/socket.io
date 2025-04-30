@@ -8,10 +8,12 @@ datasource db {
 }
 
 model User {
-  id          Int          @id @default(autoincrement())
-  name        String
-  forms       Form[]       @relation("UserToForms")
-  sharedForms SharedForm[] @relation("UserToSharedForms")
+  id               Int            @id @default(autoincrement())
+  name             String
+  forms            Form[]         @relation("UserToForms")
+  sharedForms      SharedForm[]   @relation("UserToSharedForms")
+  sentNotifications Notification[] @relation("SenderNotifications")
+  receivedNotifications Notification[] @relation("RecipientNotifications")
 }
 
 model Form {
@@ -28,4 +30,19 @@ model SharedForm {
   userId Int
   form   Form @relation("FormToSharedForms", fields: [formId], references: [id], onDelete: Cascade)
   user   User @relation("UserToSharedForms", fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Notification {
+  id          Int      @id @default(autoincrement())
+  senderId    Int
+  recipientId Int
+  formId      Int
+  message     String
+  delivered   Boolean  @default(false)
+  read        Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  
+  sender      User     @relation("SenderNotifications", fields: [senderId], references: [id], onDelete: Cascade)
+  recipient   User     @relation("RecipientNotifications", fields: [recipientId], references: [id], onDelete: Cascade)
+  form        Form     @relation(fields: [formId], references: [id], onDelete: Cascade)
 }

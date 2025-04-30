@@ -10,6 +10,7 @@ const SharedFormProvider = ({ children }) => {
     const [error, setError] = useState(null);
     const { socket } = useSocket();
 
+    // função que busca os formulários compartilhados do usuário
     const fetchSharedForms = useCallback(async (userId) => {
         setLoading(true);
         setError(null);
