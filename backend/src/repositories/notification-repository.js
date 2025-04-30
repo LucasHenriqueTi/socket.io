@@ -57,9 +57,25 @@ const markNotificationAsDelivered = async (notificationId) => {
     });
 };
 
+// marca uma notificação como lida 
 const markNotificationAsRead = async (notificationId) => {
     return await prisma.notification.update({
         where: { id: parseInt(notificationId, 10)},
         data: { read: true}
-    })
-}
+    });
+};
+
+const deleteNotificationById = async (notificationId) => {
+    return await prisma.notification.delete({
+        where: { id: parseInt(notificationId, 10) }
+    });
+};
+
+export {
+    createNotification,
+    getPedingNotifications,
+    getUserNotifications,
+    markNotificationAsDelivered,
+    markNotificationAsRead,
+    deleteNotificationById
+};
