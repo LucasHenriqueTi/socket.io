@@ -17,12 +17,14 @@ model User {
 }
 
 model Form {
-  id          Int          @id @default(autoincrement())
-  name        String
-  userId      Int
-  user        User         @relation("UserToForms", fields: [userId], references: [id], onDelete: Cascade)
-  sharedForms SharedForm[] @relation("FormToSharedForms")
+  id             Int             @id @default(autoincrement())
+  name           String
+  userId         Int
+  user           User            @relation("UserToForms", fields: [userId], references: [id], onDelete: Cascade)
+  sharedForms    SharedForm[]    @relation("FormToSharedForms")
+  notifications  Notification[]  @relation("FormToNotifications") // <-- ESTE CAMPO É NOVO
 }
+
 
 model SharedForm {
   id     Int  @id @default(autoincrement())
@@ -41,8 +43,8 @@ model Notification {
   delivered   Boolean  @default(false)
   read        Boolean  @default(false)
   createdAt   DateTime @default(now())
-  
+
   sender      User     @relation("SenderNotifications", fields: [senderId], references: [id], onDelete: Cascade)
   recipient   User     @relation("RecipientNotifications", fields: [recipientId], references: [id], onDelete: Cascade)
-  form        Form     @relation(fields: [formId], references: [id], onDelete: Cascade)
+  form        Form     @relation("FormToNotifications", fields: [formId], references: [id], onDelete: Cascade)
 }
