@@ -9,12 +9,10 @@ import {authenticate} from '../middlewares/auth.js';
 
 const router = Router();
 
-router.use(authenticate);
-
 // Define as rotas para as notificações
-router.post('/', createNotification);
-router.get('/user/:userId', getUserNotifications);
-router.patch('/:notificationId/read', markNotificationAsRead);
-router.delete('/:notificationId', deleteUserNotification);
+router.post('/',authenticate, createNotification);
+router.get('/user/:userId',authenticate, getUserNotifications);
+router.patch('/:notificationId/read',authenticate, markNotificationAsRead);
+router.delete('/:notificationId',authenticate, deleteUserNotification);
 
 export default router;
