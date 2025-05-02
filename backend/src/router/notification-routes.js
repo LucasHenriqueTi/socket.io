@@ -3,9 +3,9 @@ import {
     createNotification,
     getUserNotifications,
     markNotificationAsRead,
-    removeNotification
+    deleteUserNotification
 } from '../controllers/notification-controller.js';
-import authenticate from '../middlewares/auth.js';
+import {authenticate} from '../middlewares/auth.js';
 
 const router = Router();
 
@@ -15,6 +15,6 @@ router.use(authenticate);
 router.post('/', createNotification);
 router.get('/user/:userId', getUserNotifications);
 router.patch('/:notificationId/read', markNotificationAsRead);
-router.delete('/:notificationId', removeNotification);
+router.delete('/:notificationId', deleteUserNotification);
 
 export default router;

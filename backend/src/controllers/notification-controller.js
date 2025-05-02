@@ -19,7 +19,7 @@ const createNotification = async (req, res) => {
 };
 
 // Obtem todas as notificações do usuário
-const getuserNotifications = async (req, res) => {
+const getUserNotifications = async (req, res) => {
     const { userId } = req.params;
 
     try {
@@ -59,7 +59,7 @@ const deleteUserNotification = async (req, res) => {
 
 export {
     createNotification,
-    getuserNotifications,
+    getUserNotifications,
     markNotificationAsRead,
     deleteUserNotification
 };

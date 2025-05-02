@@ -2,6 +2,7 @@ import { Server } from 'socket.io';
 import { shareFormWithUser } from '../repositories/shared-form-repository.js';
 import { createNotification, getPedingNotifications, markNotificationAsDelivered } from '../repositories/notification-repository.js';
 
+// Configuração do Socket.IO
 const configureSocket = (server) => {
     const io = new Server(server, {
         cors: {
@@ -13,13 +14,15 @@ const configureSocket = (server) => {
         }
     });
 
+    // Middleware para autenticação
     io.use(async (socket, next) => {
         try {
+            // Verifica se o token de autenticação está presente
             const userId = parseInt(socket.handshake.auth.userId, 10);
             if (!userId) {
                 return next(new Error('Não autenticado'));
             }
-
+            // Verifica se o usuário está autenticado
             const sockets = await io.in(`user_${userId}`).fetchSockets();
             sockets.forEach(s => {
                 if (s.id !== socket.id) {
@@ -34,6 +37,7 @@ const configureSocket = (server) => {
         }
     });
 
+    // Evento de conexão
     io.on('connection', async (socket) => {
         socket.join(`user_${socket.userId}`);
         

@@ -1,7 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import router from './src/router/index.js'; 
-
+import notificationRoutes from './src/router/notification-routes.js';
 
 const app = express();
 
@@ -19,5 +19,7 @@ app.use(express.json());
 
 // Rotas
 app.use('/api', router);
+app.use('/api/notifications', notificationRoutes);
+
 
 export default app;

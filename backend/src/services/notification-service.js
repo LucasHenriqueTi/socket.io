@@ -1,6 +1,6 @@
 import {
     createNotification,
-    getPendingNotifications,
+    getPedingNotifications,
     getUserNotifications,
     markNotificationAsDelivered,
     markNotificationAsRead,
@@ -14,7 +14,7 @@ const createNewNotification = async (senderId, recipientId, formId, message) => 
 
 // serviço para buscar noficações pendentes 
 const getPedingUserNotifications = async (recipientId) => {
-    return await getPendingNotifications(recipientId);
+    return await getPedingNotifications(recipientId);
 };
 
 // serviço para buscar todas as notificações de um usuário
