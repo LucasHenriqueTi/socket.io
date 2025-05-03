@@ -1,9 +1,18 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useSocket } from '../contexts/socket-context';
 import { useSharedFormContext } from '../contexts/share-context';
 import { useFormContext } from '../contexts/form-context';
 import { useUserContext } from '../contexts/user-context';
-import { Button, MenuItem, Box, Typography, TextField, CircularProgress, Alert, Snackbar } from '@mui/material';
+import { 
+  Button, 
+  MenuItem, 
+  Box, 
+  Typography, 
+  TextField, 
+  CircularProgress, 
+  Alert, 
+  Snackbar 
+} from '@mui/material';
 
 const ShareForm = () => {
   const [formId, setFormId] = useState('');
@@ -21,22 +30,27 @@ const ShareForm = () => {
 
     try {
       // 1. Primeiro compartilha no banco de dados
-      await shareForm(Number(formId), Number(userId));
+      const sharedForm = await shareForm(Number(formId), Number(userId));
       
       // 2. Emite o evento via socket com callback
       if (socket) {
         socket.emit('share-form', 
-          { formId: Number(formId), recipientId: Number(userId) },
+          { 
+            formId: Number(formId), 
+            recipientId: Number(userId),
+            formName: sharedForm.form.name,
+            senderName: sharedForm.sender.name
+          },
           (response) => {
             if (response.success) {
               setSuccess(response.message);
             } else {
-              setError(response.error);
+              setError(response.message || 'Erro ao notificar usuário');
             }
           }
         );
       } else {
-        setSuccess('Formulário compartilhado (usuário offline será notificado quando se conectar)');
+        setSuccess('Formulário compartilhado. O usuário será notificado quando se conectar.');
       }
       
       setFormId('');
@@ -110,6 +124,7 @@ const ShareForm = () => {
         open={!!error}
         autoHideDuration={6000}
         onClose={() => setError(null)}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
       >
         <Alert severity="error" onClose={() => setError(null)}>
           {error}
@@ -120,6 +135,7 @@ const ShareForm = () => {
         open={!!success}
         autoHideDuration={6000}
         onClose={() => setSuccess(null)}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
       >
         <Alert severity="success" onClose={() => setSuccess(null)}>
           {success}

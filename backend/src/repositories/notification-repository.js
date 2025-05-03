@@ -39,7 +39,7 @@ const getUserNotifications = async (userId) => {
         where: {
             recipientId: parseInt(userId, 10)
         },
-        ordenBy: {
+        orderBy: {
             createdAt: 'asc'
         },
         include: {

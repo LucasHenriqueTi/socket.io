@@ -1,16 +1,13 @@
-import { useState } from 'react';
-import { useSocket } from '../contexts/socket-context';
-import { Badge, Popover, List, ListItem, ListItemText, IconButton, Typography, Button, Box } from '@mui/material';
+import { Badge, IconButton, Popover, List, ListItem, ListItemText, Typography, Box } from '@mui/material';
 import NotificationsIcon from '@mui/icons-material/Notifications';
-import { useNavigate } from 'react-router-dom';
+import { useState } from 'react';
+import { useNotifications } from '../contexts/notification-context';
 
 const NotificationBell = () => {
-  const { notifications, markNotificationAsRead, clearNotifications } = useSocket();
   const [anchorEl, setAnchorEl] = useState(null);
-  const navigate = useNavigate();
-  const unreadCount = notifications.filter(n => !n.read).length;
+  const { notifications, unreadCount, markAsRead } = useNotifications();
 
-  const handleOpen = (event) => {
+  const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
   };
 
@@ -18,81 +15,69 @@ const NotificationBell = () => {
     setAnchorEl(null);
   };
 
-  // função para lidar com o clique na notificação
-  const handleNotificationClick = (notification) => {
-    markNotificationAsRead(notification.id);
-    if (notification.formId) {
-      navigate(`/forms/${notification.formId}`); // Navega para o formulário associado à notificação
-    }
-    handleClose();
-  };
-
-  const handleClearAll = () => {
-    clearNotifications();
-    handleClose();
-  };
+  const open = Boolean(anchorEl);
+  const id = open ? 'notification-popover' : undefined;
 
   return (
-    <>
-      <IconButton color="inherit" onClick={handleOpen}>
+    <Box>
+      <IconButton 
+        color="inherit" 
+        onClick={handleClick}
+        aria-describedby={id}
+        disabled={!unreadCount}
+      >
         <Badge badgeContent={unreadCount} color="error">
           <NotificationsIcon />
         </Badge>
       </IconButton>
 
       <Popover
-        open={Boolean(anchorEl)}
+        id={id}
+        open={open}
         anchorEl={anchorEl}
         onClose={handleClose}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-        transformOrigin={{ vertical: 'top', horizontal: 'right' }}
-        sx={{ 
-          maxHeight: '80vh',
-          '& .MuiPaper-root': { width: 360 }
+        anchorOrigin={{
+          vertical: 'bottom',
+          horizontal: 'right',
+        }}
+        transformOrigin={{
+          vertical: 'top',
+          horizontal: 'right',
         }}
       >
-        <Box sx={{ p: 2 }}>
-          <Box sx={{ 
-            display: 'flex', 
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            mb: 1
-          }}>
-            <Typography variant="h6">Notificações</Typography>
-            {notifications.length > 0 && (
-              <Button 
-                size="small" 
-                onClick={handleClearAll}
-                disabled={notifications.length === 0}
-              >
-                Limpar todas
-              </Button>
-            )}
-          </Box>
-
+        <Box sx={{ width: 360, p: 2, maxHeight: 400, overflow: 'auto' }}>
+          <Typography variant="h6" gutterBottom>
+            Notificações {unreadCount > 0 && `(${unreadCount} novas)`}
+          </Typography>
           {notifications.length === 0 ? (
-            <Typography variant="body2" sx={{ p: 2, textAlign: 'center' }}>
+            <Typography variant="body2" color="text.secondary">
               Nenhuma notificação
             </Typography>
           ) : (
-            <List dense sx={{ maxHeight: 300, overflow: 'auto' }}>
+            <List dense>
               {notifications.map((notification) => (
                 <ListItem 
                   key={notification.id}
-                  button
-                  onClick={() => handleNotificationClick(notification)}
-                  sx={{
+                  sx={{ 
                     bgcolor: notification.read ? 'background.paper' : 'action.selected',
-                    borderBottom: '1px solid',
-                    borderColor: 'divider'
+                    cursor: 'pointer',
+                    '&:hover': { bgcolor: 'action.hover' }
+                  }}
+                  onClick={() => {
+                    markAsRead(notification.id);
+                    handleClose();
                   }}
                 >
                   <ListItemText
                     primary={notification.message}
-                    secondary={new Date(notification.timestamp).toLocaleString()}
-                    primaryTypographyProps={{
-                      fontWeight: notification.read ? 'normal' : 'bold'
-                    }}
+                    secondary={
+                      <>
+                        <Typography component="span" variant="body2" color="text.primary">
+                          {notification.senderName}
+                        </Typography>
+                        {` - ${new Date(notification.timestamp).toLocaleString()}`}
+                      </>
+                    }
                   />
                 </ListItem>
               ))}
@@ -100,8 +85,8 @@ const NotificationBell = () => {
           )}
         </Box>
       </Popover>
-    </>
+    </Box>
   );
-};
+}
 
 export default NotificationBell;

@@ -9,23 +9,36 @@ const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const { socket, isConnected, connectSocket, disconnectSocket } = useSocket();
 
-  // função para verificar se o usuário está autenticado
+  const setupSocketAuth = useCallback((userId) => {
+    if (socket) {
+      console.log('[Auth] Configurando autenticação do socket para usuário:', userId);
+      socket.auth = { userId };
+      
+      // Remove listeners anteriores para evitar duplicação
+      socket.off('connect');
+      socket.off('disconnect');
+      
+      socket.on('connect', () => {
+        console.log('[Auth] Socket autenticado com userId:', userId);
+      });
+      
+      socket.on('disconnect', () => {
+        console.log('[Auth] Socket desconectado');
+      });
+      
+      if (!socket.connected) {
+        connectSocket();
+      }
+    }
+  }, [socket, connectSocket]);
+
   const login = useCallback((userData) => {
     localStorage.setItem('user', JSON.stringify(userData));
     Cookies.set('token', userData.token);
     setUser(userData);
-    
-    // Configurar autenticação do socket
-    if (socket) {
-      console.log('[Auth] Configurando autenticação do socket');
-      socket.auth = (cb) => cb({ userId: userData.id });
-      if (!socket.connected) {
-        socket.connect();
-      }
-    }
-  }, [socket]);
+    setupSocketAuth(userData.id);
+  }, [setupSocketAuth]);
 
-  // função para fazer logout do usuário
   const logout = useCallback(() => {
     disconnectSocket();
     localStorage.removeItem('user');
@@ -33,7 +46,6 @@ const AuthProvider = ({ children }) => {
     setUser(null);
   }, [disconnectSocket]);
 
-  // função para verificar se o usuário está autenticado e reconectar o socket em caso de reconexão
   useEffect(() => {
     const initializeAuth = async () => {
       const storedUser = localStorage.getItem('user');
@@ -42,20 +54,13 @@ const AuthProvider = ({ children }) => {
       if (storedUser && token) {
         const parsedUser = JSON.parse(storedUser);
         setUser(parsedUser);
-        
-        if (socket) {
-          console.log('[Auth] Inicializando conexão do socket');
-          socket.auth = (cb) => cb({ userId: parsedUser.id });
-          if (!socket.connected) {
-            socket.connect();
-          }
-        }
+        setupSocketAuth(parsedUser.id);
       }
       setLoading(false);
     };
   
     initializeAuth();
-  }, [socket]); 
+  }, [setupSocketAuth]); 
 
   return (
     <AuthContext.Provider
@@ -66,6 +71,7 @@ const AuthProvider = ({ children }) => {
         logout,
         loading,
         isAuthenticated: !!user,
+        socket,
         socketConnected: isConnected
       }}
     >
@@ -75,4 +81,4 @@ const AuthProvider = ({ children }) => {
 };
 
 export const useAuth = () => useContext(AuthContext);
-export { AuthProvider };
+export  default AuthProvider;
