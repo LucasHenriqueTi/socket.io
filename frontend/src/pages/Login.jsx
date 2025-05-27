@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { TextField, Button, Box, Alert } from '@mui/material';
 import { useAuth } from '../contexts/auth-context';
 import { useNavigate } from 'react-router-dom';
+import SureBetCalculator from '../components/Calculadora';
 import axios from 'axios';
 
 
@@ -30,7 +31,7 @@ const handleSubmit = async (e) => {
 
   return (
     <Box sx={{ maxWidth: 400, mx: 'auto', mt: 8, p: 3 }}>
-      <h2>Login</h2>
+      <SureBetCalculator/>
       {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
       
       <Box component="form" onSubmit={handleSubmit}>
